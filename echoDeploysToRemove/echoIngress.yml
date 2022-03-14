@@ -1,0 +1,14 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: meow-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/tls-auth-verify-cn: "{{.CNRegex1}}"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /meow
+        backend:
+          serviceName: meow-svc
+          servicePort: 80
