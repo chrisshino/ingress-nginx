@@ -23,7 +23,6 @@ import (
 	"k8s.io/ingress-nginx/internal/ingress/annotations/proxyssl"
 	"k8s.io/ingress-nginx/internal/ingress/annotations/sslcipher"
 	"k8s.io/ingress-nginx/internal/ingress/annotations/streamsnippet"
-	"k8s.io/ingress-nginx/internal/ingress/annotations/tlsauthverifycn"
 	"k8s.io/klog/v2"
 
 	apiv1 "k8s.io/api/core/v1"
@@ -118,7 +117,6 @@ type Ingress struct {
 	ModSecurity        modsecurity.Config
 	Mirror             mirror.Config
 	StreamSnippet      string
-	TLSAuthVerifyCN    tlsauthverifycn.Config
 }
 
 // Extractor defines the annotation parsers to be used in the extraction of annotations
@@ -170,7 +168,6 @@ func NewAnnotationExtractor(cfg resolver.Resolver) Extractor {
 			"ModSecurity":          modsecurity.NewParser(cfg),
 			"Mirror":               mirror.NewParser(cfg),
 			"StreamSnippet":        streamsnippet.NewParser(cfg),
-			"TLSAuthVerifyCN":      tlsauthverifycn.NewParser(cfg),
 		},
 	}
 }

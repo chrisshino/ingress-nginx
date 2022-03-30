@@ -633,6 +633,15 @@ http {
         {{ $cfg.ServerSnippet }}
         {{ end }}
 
+        {{ if not ( empty $server.CertificateAuth.MatchCN ) }}
+        {{ if gt (len $server.CertificateAuth.MatchCN) 0 }}
+        if ($ssl_client_s_dn !~ $server.CertificateAuth.MatchCN) {
+        # client certificate unauthorized
+        return 403;
+        }
+        {{ end }}
+        {{ end }}      
+
         {{ template "CUSTOM_ERRORS" (buildCustomErrorDeps "upstream-default-backend" $cfg.CustomHTTPErrors $all.EnableMetrics) }}
     }
     ## end server {{ $server.Hostname }}
