@@ -36,7 +36,7 @@ const (
 
 var (
 	authVerifyClientRegex = regexp.MustCompile(`on|off|optional|optional_no_ca`)
-	commonNameRegex       = regexp.MustCompile(`<\w+|>|/\w+`)
+	commonNameRegex       = regexp.MustCompile(`CN=`)
 )
 
 // Config contains the AuthSSLCert used for mutual authentication
@@ -131,7 +131,7 @@ func (a authTLS) Parse(ing *networking.Ingress) (interface{}, error) {
 	}
 
 	config.MatchCN, err = parser.GetStringAnnotation("auth-tls-match-cn", ing)
-	if err != nil || commonNameRegex.MatchString(config.MatchCN) {
+	if err != nil || !commonNameRegex.MatchString(config.MatchCN) {
 		config.MatchCN = ""
 	}
 
