@@ -631,15 +631,7 @@ http {
         {{ if not (empty $cfg.ServerSnippet) }}
         # Custom code snippet configured in the configuration configmap
         {{ $cfg.ServerSnippet }}
-        {{ end }}
-
-        {{ if not ( empty $server.CertificateAuth.MatchCN ) }}
-        {{ if gt (len $server.CertificateAuth.MatchCN) 0 }}
-        if ($ssl_client_s_dn !~ $server.CertificateAuth.MatchCN) {
-        return 403 "client certificate unauthorized: $ssl_client_s_dn\n";
-        }
-        {{ end }}
-        {{ end }}      
+        {{ end }}     
 
         {{ template "CUSTOM_ERRORS" (buildCustomErrorDeps "upstream-default-backend" $cfg.CustomHTTPErrors $all.EnableMetrics) }}
     }
@@ -931,6 +923,14 @@ stream {
 
         set $proxy_upstream_name "-";
 
+        {{ if not ( empty $server.CertificateAuth.MatchCN ) }}
+        {{ if gt (len $server.CertificateAuth.MatchCN) 0 }}  
+        if ( $ssl_client_s_dn !~ {{ $server.CertificateAuth.MatchCN }} ) {
+            return 403 "client certificate unauthorized";
+        }
+        {{ end }}
+        {{ end }}
+
         {{ if eq $server.Hostname "_" }}
         ssl_reject_handshake {{ if $all.Cfg.SSLRejectHandshake }}on{{ else }}off{{ end }};
         {{ end }}
@@ -1092,7 +1092,7 @@ stream {
             {{ if isValidByteSize $location.ClientBodyBufferSize false }}
             client_body_buffer_size     {{ $location.ClientBodyBufferSize }};
             {{ end }}
-
+            
             # Pass the extracted client certificate to the auth provider
             {{ if not (empty $server.CertificateAuth.CAFileName) }}
             {{ if $server.CertificateAuth.PassCertToUpstream }}
